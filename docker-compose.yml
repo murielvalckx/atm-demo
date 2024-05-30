@@ -1,0 +1,35 @@
+version: '3.0'
+
+services:
+
+  # READ (metadata / content)
+  archive-txt-miner:
+    build: ./
+    command: python3 manage.py run -h 0.0.0.0 -p 5001
+    # gunicorn --reload --workers 4 --timeout 300 --threads 4 --worker-tmp-dir /dev/shm --bind 0.0.0.0:5011 manage:app
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+    container_name: archive-txt-miner
+    expose:
+      - 5001
+    volumes:
+     - ./nltk_data:/data/atm/nltk_data
+    labels:
+      cps.stack: "API"
+      cps.name: "CPS read"        
+      cps.env: "acc"
+    healthcheck:
+      test: "/data/atm/web/healtcheck.sh localhost 5001 /heartbeat"
+      interval: 30s
+      timeout: 10s
+      retries: 20     
+    logging:
+      driver: "json-file"
+      options:
+        max-file: 5
+        max-size: 15m         
+  
+networks:
+  cps_acc:
+     external: true
