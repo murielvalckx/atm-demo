@@ -10,8 +10,11 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 import magic
 import mimetypes
 import langdetect
+import sentencepiece
 import torch
 import transformers
+import xml.etree.ElementTree as ET
+from flask import send_file
 
 class api_atm:
 
@@ -73,7 +76,7 @@ class api_atm:
     #  Process a PDF
     #
     #  @param string localFile
-    #  @return json
+    #  @return dict
     #
     ##############################################################################
     def process_pdf(self, localFile):
@@ -89,7 +92,8 @@ class api_atm:
                   "error"    : "",
                   "size"     : 0,
                   "id_list"  : {"kvk" : {}, "bsn" : {}},
-                  "status"   : 500}
+                  "status"   : 500,
+                  "filename" : localFile}
 
         # Get filesize
         result["size"] = os.path.getsize(localFile)
@@ -132,6 +136,86 @@ class api_atm:
             result["id_list"]["kvk"] = self._findRegEx(r'\b\d{8}\b', text)
 
         return result
+
+    ##############################################################################
+    #  
+    #  create_xml_file
+    #
+    #  Process a PDF
+    #
+    #  @param string localFile
+    #  @return xml
+    #
+    ##############################################################################
+    def process_xml(self, localFile):
+        atts = self.process_pdf(localFile)
+        bestandsnaam = atts["filename"]
+        size = str(atts["size"])
+        mimetype = str(atts["mime"])
+        text = str(atts["text"])
+        title = str(atts["title"])
+        language = str(atts["language"])
+        keywords = str(atts["keywords"])
+        summary = str(atts["summary"])
+        bsn = ",".join(atts["id_list"]["bsn"])
+        kvk = ",".join(atts["id_list"]["kvk"])
+        
+        root = ET.Element("MDTO", xmlns="https://www.nationaalarchief.nl/mdto", xmlns_xsi="http://www.w3.org/2001/XMLSchema-instance", xsi_schemaLocation="https://www.nationaalarchief.nl/mdto https://www.nationaalarchief.nl/mdto/MDTO-XML1.0.1.xsd")
+
+        bestand = ET.SubElement(root, "bestand")
+
+        identificatie = ET.SubElement(bestand, "identificatie")
+        ET.SubElement(identificatie, "identificatieKenmerk").text = ""
+        ET.SubElement(identificatie, "identificatieBron").text = ""
+
+        ET.SubElement(bestand, "naam").text = bestandsnaam
+
+        omvang = ET.SubElement(bestand, "omvang")
+        omvang.text = size
+
+        omschrijving = ET.SubElement(bestand, "omschrijving")
+        omschrijving.text = summary
+
+        taal = ET.SubElement(bestand, "taal")
+        taal.text = language
+
+        kvknummer = ET.SubElement(bestand, "kvkNummer")
+        kvknummer.text = kvk
+
+        bsn_nummer = ET.SubElement(bestand, "bsnNummer")
+        bsn_nummer.text = bsn
+
+        bestandsformaat = ET.SubElement(bestand, "bestandsformaat")
+        ET.SubElement(bestandsformaat, "begripLabel").text = mimetype
+        ET.SubElement(bestandsformaat, "begripCode").text = ""
+        begripBegrippenlijst = ET.SubElement(bestandsformaat, "begripBegrippenlijst")
+        ET.SubElement(begripBegrippenlijst, "verwijzingNaam").text = keywords
+
+        checksum = ET.SubElement(bestand, "checksum")
+        checksumAlgoritme = ET.SubElement(checksum, "checksumAlgoritme")
+        ET.SubElement(checksumAlgoritme, "begripLabel").text = ""
+        checksumBegrippenlijst = ET.SubElement(checksumAlgoritme, "begripBegrippenlijst")
+        ET.SubElement(checksumBegrippenlijst, "verwijzingNaam").text = title
+        ET.SubElement(checksum, "checksumWaarde").text = ""
+        ET.SubElement(checksum, "checksumDatum").text = ""
+
+        ET.SubElement(bestand, "URLBestand").text = ""
+
+        isRepresentatieVan = ET.SubElement(bestand, "isRepresentatieVan")
+        ET.SubElement(isRepresentatieVan, "verwijzingNaam").text = ""
+        verwijzingIdentificatie = ET.SubElement(isRepresentatieVan, "verwijzingIdentificatie")
+        ET.SubElement(verwijzingIdentificatie, "identificatieKenmerk").text = ""
+        ET.SubElement(verwijzingIdentificatie, "identificatieBron").text = ""
+
+        xml_filename = os.path.join(f"{localFile}.xml")
+
+        tree = ET.ElementTree(root)
+        ET.indent(tree, '  ')
+
+        with open(xml_filename, 'wb') as xml_file:
+            tree.write(xml_file, encoding='utf-8')
+        
+        return send_file(xml_filename)
 
 
     ##############################################################################

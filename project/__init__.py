@@ -105,6 +105,37 @@ def route_handler_proces_zip():#
     return make_response("OK from proces_zip"), 200#
 
 
+##############################################################################
+#  
+#  proces_xml
+#
+#  Process a zip file
+#
+#  @param void
+#  @return xml
+##############################################################################
+@app.route("/proces_xml", methods=['POST'])
+def route_handler_proces_xml():
+
+    # set env params
+    basePath     = "C:\WINDOWS\Temp" 
+    maxSize      = os.getenv("MAX_SIZE", 4194304)
+    allowedTypes = {'pdf', 'zip'}
+
+    # Check / save uploaded file
+    localFile = utils_atm.saveUploadedFileToLocalFile(basePath, maxSize, allowedTypes)
+    status    = int(localFile["status"])
+
+    # If all ok, start handling the file contents
+    if (status == 200):
+
+        procesData = ATM.process_xml(localFile["local_file"])
+        return make_response(procesData), 200
+
+    else:
+        return make_response(localFile), status
+
+
 
 
 
