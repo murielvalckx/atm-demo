@@ -10,6 +10,8 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 import magic
 import mimetypes
 import langdetect
+import torch
+import transformers
 
 class api_atm:
 
@@ -83,6 +85,7 @@ class api_atm:
                   "language" : "",
                   "title"    : "",
                   "keywords" : {},
+                  "summary"  : "", 
                   "error"    : "",
                   "size"     : 0,
                   "id_list"  : {"kvk" : {}, "bsn" : {}},
@@ -111,7 +114,7 @@ class api_atm:
             result["status"]   = 200
 
             # get working title
-            workingTitle = self._generate_working_title(text)
+            workingTitle = self._generate_working_title(result["cleaned"])
 
             if (workingTitle == ""):
                 result["error"] = self.error    
@@ -119,7 +122,10 @@ class api_atm:
                 result["title"] = workingTitle
 
             # Top keywords
-            result["keywords"] = self._extract_top_keywords(text)
+            result["keywords"] = self._extract_top_keywords(result["cleaned"])
+            
+            # Summary
+            result["summary"] = self._generate_summary(result["cleaned"])
 
             # KVK / BSN ID's
             result["id_list"]["bsn"] = self._findRegEx(r'\b(\d{9})\b', text)
@@ -235,7 +241,39 @@ class api_atm:
 
         return sorted(word_tfidf_scores, key=word_tfidf_scores.get, reverse=True)[:10]
 
+    ##############################################################################
+    #  
+    #  _generate_summary
+    #
+    #  Create a summary from the cleaned text
+    #
+    #  @param string text
+    #  @return string
+    #
+    ##############################################################################
+    def _generate_summary(self, text):
+        model = transformers.MBartForConditionalGeneration.from_pretrained("ml6team/mbart-large-cc25-cnn-dailymail-nl-finetune")
+        tokenizer = transformers.MBartTokenizer.from_pretrained("facebook/mbart-large-cc25")
 
+        pipeline_summarize = transformers.pipeline(
+            task="summarization",
+            model=model,
+            tokenizer=tokenizer
+        )
+
+        pipeline_summarize.model.config.decoder_start_token_id = tokenizer.lang_code_to_id[
+            "nl_XX"
+        ]
+        # Encode the cleaned text with Dutch language code
+        inputs = tokenizer.encode(text, return_tensors="pt", max_length=1024, truncation=True)
+
+        # Generate summary
+        summary_ids = model.generate(inputs, top_p=0.95, top_k=3, max_length=64,
+                                    min_length=0, length_penalty=2.0,
+                                    num_beams=2, early_stopping=True, do_sample=True)
+        summary = tokenizer.decode(summary_ids[0], skip_special_tokens=True)
+    
+        return summary
 
     ##############################################################################
     #  
