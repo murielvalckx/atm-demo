@@ -15,7 +15,8 @@ import sentencepiece
 import torch
 import transformers
 import xml.etree.ElementTree as ET
-from flask import send_file
+from flask import send_file, url_for
+
 
 class api_atm:
 

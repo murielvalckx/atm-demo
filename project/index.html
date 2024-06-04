@@ -1,7 +1,196 @@
-    <form id='atm_upload' name='atm_upload' action='http://127.0.0.1:5000/proces_xml' method='post' enctype='multipart/form-data'>
-        <label for='source'>Upload file:</label>
-        <input id='source' name='source' type='file' accept=".pdf" required>
-        <br>
-        <button type='submit'>Upload</button>
-    </form>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MDTO-metadata met AI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Be Vietnam', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #aa004a;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f1ebe5;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .header img {
+            width: auto;
+            height: 2cm;
+            margin-right: 20px;
+        }
+        .content {
+            display: flex;
+            justify-content: space-between;
+        }
+        .text-content {
+            flex: 1;
+            margin-right: 20px;
+        }
+        .text-content h1 {
+            font-size: 3em;
+            font-weight: bold;
+            color: #406674;
+            letter-spacing: 0.01px;
+        }
+        .text-content h2 {
+            font-weight: 800;
+            color: #555;
+        }
+        .text-content p {
+            font-size: 1em;
+            line-height: 1.5;
+            color: #333;
+        }
+        .image-content {
+            flex: 1;
+            text-align: center;
+        }
+        .image-content img {
+            max-width: 100%;
+            height: auto;
+        }
+        form {
+            margin-top: 20px;
+            text-align: center;
+        }
+        label {
+            font-weight: 700;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 1em;
+            font-weight: 700;
+            color: #fff;
+            background-color: #007BFF;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 20px; 
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .feedback, .community, .other-links {
+            margin-top: 40px;
+        }
+        .feedback h3, .community h3, .other-links h3 {
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .feedback p, .community p, .other-links p {
+            font-size: 1.1em;
+            text-align: center;
+            color: #333;
+        }
+        .links {
+            text-align: center;
+            margin-top: 10px;
+        }
+        .links a {
+            margin: 0 10px;
+            font-size: 1.1em;
+            color: #007BFF;
+            text-decoration: none;
+        }
+        .links a:hover {
+            text-decoration: underline;
+        }
+        .footer {
+            margin-top: 40px;
+            text-align: center;
+            font-size: 0.9em;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <img src="static/PZ-logo.png" alt="PZ.logo">
+            <img src="static/za-logo.avif" alt="ZA.logo">
+        </div>
+        <div class="content">
+            <div class="text-content">
+                <h2>Metadata Magic:</h2>
+                <h1>MDTO-metadata met AI</h1>
+                <p>Het handmatig cre&#xEB;ren van metadata is een tijdrovend proces en in praktijk
+                    is metadata vaak incompleet of zelfs helemaal niet aanwezig.  
+                    Met de komst van de Wet open overheid (Woo) wordt de noodzaak aan goede metadata alleen maar groter. 
+                    Kunstmatige intelligentie (AI) kan hierbij ondersteunen.</p>
+            </div>
+            <div class="image-content">
+                <img src="static/metadata.png" alt="logo">
+            </div>
+        </div>
+        <div style="text-align: center;">
+            <img src="static/ArchiveTextMiner_logo.png" alt="ATM.logo" style="width: 700px;">
+            <br>
+            <br>
+        </div> 
+        <div class="form-section"> 
+            <form id="atm_upload" name="atm_upload" action="http://127.0.0.1:5000/proces_xml" method="post" enctype="multipart/form-data">
+                <label for="source">Kies een PDF-bestand:</label>
+                <input id="source" name="source" type="file" accept=".pdf" required>
+                <br>
+                <br>
+                <button type="submit">Upload</button>
+                <br>
+            </form>
+                <br>
+                <p>Deze tool is specifiek ontworpen om tekstuele informatie uit PDF-bestanden te halen en metadata te cre&#xEB;ren. 
+                De tool schoont de tekst op en verwerkt het per bestand, om vervolgens gestructureerde XML-bestanden met metadata in MDTO-formaat te genereren. 
+                Het primaire doel is om ongestructureerde gegevens om te zetten in gestructureerde metadata, waardoor doorzoekbaarheid wordt verbeterd.</p>
+        </div>
+        <div class="feedback">
+            <h3>Laat je feedback achter</h3>
+            <p>Heb je idee&#xEB;n voor een nieuwe functionaliteit of wil je meedenken? Vul dan het formulier in!</p>
+            <div class="links">
+                <a href="https://forms.gle/your-google-form-link">Formulier</a>
+            </div>
+        </div>
+        <div class="community">
+            <h3>Word lid van de community</h3>
+            <div class="links">
+                <a href="#">Hier komt de link van de community</a>
+                <p>Om samenwerking te bevorderen en doorontwikkeling te
+                    stimuleren wordt gewerkt aan een platform voor de tool. Dit
+                    platform zal dienen als een centrale hub voor gebruikers van
+                    de AI-tool om:</p>
+                    <p>Idee&#xEB;n te delen. Gebruikers kunnen hun idee&#xEB;n en suggesties voor de verbetering van de tool delen met de community.
+                        Samen te werken. Er kunnen werkgroepen worden opgericht om te focussen op specifieke aspecten van de tool of
+                        nieuwe functionaliteiten te ontwikkelen.
+                        Op de hoogte te blijven. Via het platform blijven gebruikers
+                        op de hoogte van de laatste ontwikkelingen rond de tool en
+                        eventuele aankomende workshops.
+                        Het platform wordt naar verwachting in het najaar van 2024
+                        gelanceerd. Meer informatie over het platform en de registratieprocedure volgt te zijner tijd.</p>
+            </div>
+        </div>
+        <div class="other-links">
+            <h3>Overige links</h3>
+            <div class="links">
+                <a href="https://github.com/zeeuws-archief/ArchiveTextMiner">GitHub</a>
+                <a href="https://zeeland.nl">Provincie Zeeland</a>
+                <a href="https://zeeuwsarchief.nl">Zeeuws Archief</a>
+            </div>
+        </div>
+        <div class="footer">
+            &copy; Provincie Zeeland en Zeeuws Archief
+        </div>
+    </div>
+</body>
+</html>
+
 
