@@ -1,6 +1,8 @@
 
 # Import operating system interfaces  
 import os
+import pathlib 
+
 
 # Import Flask / Flask swagger support
 from flask import Flask, jsonify, make_response, request
@@ -135,6 +137,23 @@ def route_handler_proces_xml():
     else:
         return make_response(localFile), status
 
+##############################################################################
+#   
+#  index.html
+#
+#  Process a zip file
+#
+#  @param void
+#  @return xml
+##############################################################################
+@app.route("/demo", methods=['GET'])
+def route_handler_form():
+
+    route = os.path.abspath(os.path.dirname(__file__))
+    src = os.path.join(route, 'index.html')
+    content = open(src).read()
+
+    return make_response(content), 200
 
 
 

@@ -7,6 +7,7 @@ from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
 from nltk.stem.snowball import DutchStemmer
 from sklearn.feature_extraction.text import TfidfVectorizer
+from pathlib import Path
 import magic
 import mimetypes
 import langdetect
@@ -149,7 +150,7 @@ class api_atm:
     ##############################################################################
     def process_xml(self, localFile):
         atts = self.process_pdf(localFile)
-        bestandsnaam = atts["filename"]
+        bestandsnaam = Path(atts["filename"]).name
         size = str(atts["size"])
         mimetype = str(atts["mime"])
         text = str(atts["text"])
